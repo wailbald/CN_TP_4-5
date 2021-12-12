@@ -1,12 +1,16 @@
 exec ./LDLT.sci
+exec ./mylu1b.sci
+exec ./mylu3b.sci
 
-taille = 1010;
+taille = 310;
 iter = 20;
 [fic, mod] = mopen("LDLT.dat", "w");
 
-for t = 10 : 100 : taille
+for t = 10 : 50 : taille
     temps = 0;
     tempslu = 0;
+    temps1b = 0;
+    temps3b = 0;
     err = 0;
     errlu = 0;
 
@@ -26,6 +30,14 @@ for t = 10 : 100 : taille
         [LL,UU] = lu(AA);
         tempslu = tempslu + toc();
 
+        tic();
+        [L1b,U1b] = mylu1b(AA);
+        temps1b = temps1b + toc();
+
+        tic();
+        [L3b,U3b] = mylu3b(AA);
+        temps3b = temps3b + toc();
+
         L = tril(A);
 
         for k = 1 : t
@@ -40,8 +52,7 @@ for t = 10 : 100 : taille
         end
 
         err = norm(AA - L*DD*L');
-        errlu = norm(AA - LL*UU);
     end
-    mfprintf(fic, "%.17lf %.17lf %.17lf %.17lf %d\n", err/iter, temps/iter, errlu/iter, tempslu/iter, t);
+    mfprintf(fic, "%.17lf %.17lf %.17lf %.17lf %.17lf %d\n", err/iter, temps/iter, tempslu/iter, temps1b/iter, temps3b/iter, t);
 end
-mclose (fic);
+mclose(fic);
