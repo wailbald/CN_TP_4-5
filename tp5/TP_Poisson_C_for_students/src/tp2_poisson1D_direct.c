@@ -16,7 +16,7 @@ int main(int argc,char *argv[])
   int info;
   int NRHS;
   double T0, T1;
-  double *RHS, *EX_SOL, *X;
+  double *RHS, *RHS2, *EX_SOL, *X;
   double *AB;
 
   double temp, relres;
@@ -29,11 +29,13 @@ int main(int argc,char *argv[])
 
   printf("--------- Poisson 1D ---------\n\n");
   RHS=(double *) malloc(sizeof(double)*la);
+  RHS2=(double *) malloc(sizeof(double)*la);
   EX_SOL=(double *) malloc(sizeof(double)*la);
   X=(double *) malloc(sizeof(double)*la);
 
   set_grid_points_1D(X, &la);
   set_dense_RHS_DBC_1D(RHS,&la,&T0,&T1);
+  set_dense_RHS_DBC_1D(RHS2,&la,&T0,&T1);
   set_analytical_solution_DBC_1D(EX_SOL, X, &la, &T0, &T1);
   
   write_vec(RHS, &la, "RHS.dat");
@@ -49,31 +51,65 @@ int main(int argc,char *argv[])
 
   info=0;
 
+  double alpha = 1.0;
+  double beta = -1.0;
+  double incx = 1.0;
+  double incy = 1.0;
+
+  double *y = malloc(la * sizeof(double));
+
   /* working array for pivot used by LU Factorization */
   ipiv = (int *) calloc(la, sizeof(int));
 
-  int row = 1; //
+  int row = 0; //
 
   if (row == 1){ // LAPACK_ROW_MAJOR
     set_GB_operator_rowMajor_poisson1D(AB, &lab, &la, &kv);
-    for(int i = 0; i < lab*la; i++)
-    {
-      printf("AB[%d] = %lf\n",i,AB[i]);
-    }
     //write_GB_operator_rowMajor_poisson1D(AB, &lab, &la, "AB_row.dat");
-    
+
     info = LAPACKE_dgbsv(LAPACK_ROW_MAJOR,la, kl, ku, NRHS, AB, la, ipiv, RHS, NRHS);
+
+    free(AB);
+
+    kv = 0;
+
+    lab = ku+kl+kv+1;
+
+    AB = (double *) malloc(sizeof(double)*lab*la);
+
+    set_GB_operator_rowMajor_poisson1D(AB, &lab, &la, &kv);
+
+    cblas_dgbmv(CblasRowMajor, CblasNoTrans, la, la, kl, ku, alpha, AB, lab, EX_SOL, incx, beta, y, incy);
   
+    for(size_t i = 0; i < la; i++)
+    {
+      if(y[i] != RHS2[i])
+        printf("yi = %.16lf, RHS2i = %.16lf\n",y[i],RHS2[i]);
+    }
   } 
+
   else { // LAPACK_COL_MAJOR
     set_GB_operator_colMajor_poisson1D(AB, &lab, &la, &kv);
-    for(int i = 0; i < lab*la; i++)
-    {
-      printf("AB[%d] = %lf\n",i,AB[i]);
-    }
     //write_GB_operator_colMajor_poisson1D(AB, &lab, &la, "AB_col.dat");
 
     info = LAPACKE_dgbsv(LAPACK_COL_MAJOR,la, kl, ku, NRHS, AB, lab, ipiv, RHS, la);
+  
+    free(AB);
+
+    kv = 0;
+
+    lab = ku+kl+kv+1;
+
+    AB = (double *) malloc(sizeof(double)*lab*la);
+
+    set_GB_operator_colMajor_poisson1D(AB, &lab, &la, &kv);
+
+    cblas_dgbmv(CblasColMajor, CblasNoTrans, la, la, kl, ku, alpha, AB, lab, EX_SOL, incx, beta, y, incy);
+
+    for(size_t i = 0; i < la; i++)
+    {
+      printf("yi = %.16lf RHS2 = %.16lf\n",y[i],RHS2[i]);
+    }
   }    
 
   
