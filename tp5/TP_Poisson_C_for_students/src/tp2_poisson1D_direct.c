@@ -52,7 +52,7 @@ int main(int argc,char *argv[])
   info=0;
 
   double alpha = 1.0;
-  double beta = -1.0;
+  double beta = 0.0;
   double incx = 1.0;
   double incy = 1.0;
 
@@ -61,36 +61,38 @@ int main(int argc,char *argv[])
   /* working array for pivot used by LU Factorization */
   ipiv = (int *) calloc(la, sizeof(int));
 
-  int row = 0; //
+  int row = 1; //
 
   if (row == 1){ // LAPACK_ROW_MAJOR
+    double *AB2 = malloc(sizeof(double)*lab*la);
+    set_GB_operator_rowMajor_poisson1D(AB2, &lab, &la, &kv);
+
     set_GB_operator_rowMajor_poisson1D(AB, &lab, &la, &kv);
-    //write_GB_operator_rowMajor_poisson1D(AB, &lab, &la, "AB_row.dat");
+
+    write_GB_operator_rowMajor_poisson1D(AB, &lab, &la, "AB_row.dat");
 
     info = LAPACKE_dgbsv(LAPACK_ROW_MAJOR,la, kl, ku, NRHS, AB, la, ipiv, RHS, NRHS);
-
+    
     free(AB);
 
-    kv = 0;
+    kv = 0; 
+    lab = kl+ku+kv+1;
 
-    lab = ku+kl+kv+1;
+    AB = malloc(sizeof(double)*lab*la);
 
-    AB = (double *) malloc(sizeof(double)*lab*la);
-
-    set_GB_operator_rowMajor_poisson1D(AB, &lab, &la, &kv);
+    set_GB_operator_colMajor_poisson1D(AB, &lab, &la, &kv);
 
     cblas_dgbmv(CblasRowMajor, CblasNoTrans, la, la, kl, ku, alpha, AB, lab, EX_SOL, incx, beta, y, incy);
-  
-    for(size_t i = 0; i < la; i++)
-    {
-      if(y[i] != RHS2[i])
-        printf("yi = %.16lf, RHS2i = %.16lf\n",y[i],RHS2[i]);
-    }
+
+    write_vec(y, &la, "Y_row.dat");
+
+    free(AB2);
   } 
 
   else { // LAPACK_COL_MAJOR
     set_GB_operator_colMajor_poisson1D(AB, &lab, &la, &kv);
-    //write_GB_operator_colMajor_poisson1D(AB, &lab, &la, "AB_col.dat");
+
+    write_GB_operator_colMajor_poisson1D(AB, &lab, &la, "AB_col.dat");
 
     info = LAPACKE_dgbsv(LAPACK_COL_MAJOR,la, kl, ku, NRHS, AB, lab, ipiv, RHS, la);
   
@@ -106,10 +108,7 @@ int main(int argc,char *argv[])
 
     cblas_dgbmv(CblasColMajor, CblasNoTrans, la, la, kl, ku, alpha, AB, lab, EX_SOL, incx, beta, y, incy);
 
-    for(size_t i = 0; i < la; i++)
-    {
-      printf("yi = %.16lf RHS2 = %.16lf\n",y[i],RHS2[i]);
-    }
+    write_vec(y, &la, "Y_col.dat");
   }    
 
   

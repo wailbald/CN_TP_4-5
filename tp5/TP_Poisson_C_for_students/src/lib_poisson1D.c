@@ -110,6 +110,22 @@ void write_GB_operator_rowMajor_poisson1D(double* AB, int* lab, int* la, char* f
 }
 
 void write_GB_operator_colMajor_poisson1D(double* AB, int* lab, int* la, char* filename){
+  FILE * file;
+  int ii,jj;
+  file = fopen(filename, "w");
+  //Numbering from 1 to la
+  if (file != NULL){
+    for (ii=0;ii<(*la);ii++){
+      for (jj=0;jj<(*lab);jj++){
+  fprintf(file,"%lf\t",AB[jj*(*la)+ii]);
+      }
+      fprintf(file,"\n");
+    }
+    fclose(file);
+  }
+  else{
+    perror(filename);
+  }
   //TODO
 }
 
@@ -175,4 +191,36 @@ double richardson_alpha_opt(int *la){
 
 void richardson_alpha(double *AB, double *RHS, double *X, double *alpha_rich, int *lab, int *la,int *ku, int*kl, double *tol, int *maxit){
   //TODO
+}
+
+void facto_lu(double *A, int la)
+{
+  size_t ii = 1;
+  for(size_t kk = 0 ; kk < la-1; kk++)
+  {
+    A[kk + 2*la] = A[kk + 2*la] / A[kk + la];
+    A[ii + la] = A[ii + la] - A[kk+1] * A[kk + 2 * la];
+    ii++;
+  }
+
+}
+
+void remontee(double *U, double *b, double* x, int la)
+{
+  x[la-1] = b[la-1]/U[la-1 +la];
+
+  for(int ii = la-2; ii >= 0; ii--)
+  {
+    x[ii] = (b[ii] - U[ii] * x[ii+1])/U[ii+la];
+  }
+}
+
+void descente(double *L, double *b, double *x, int la)
+{
+  x[0] = b[0];
+
+  for(size_t ii = 1; ii < la; ii++)
+  {
+      x[ii] = b[ii] - L[ii-1 + 2*la] * x[ii-1];
+  }
 }

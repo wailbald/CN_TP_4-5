@@ -3,7 +3,7 @@ exec ./mylu1b.sci
 exec ./mylu3b.sci
 
 taille = 310;
-iter = 20;
+iter = 10;
 [fic, mod] = mopen("LDLT.dat", "w");
 
 for t = 10 : 50 : taille
@@ -51,7 +51,7 @@ for t = 10 : 50 : taille
             DD(k,k) = D(k);
         end
 
-        err = norm(AA - L*DD*L');
+        err = norm(AA - L*DD*L')/norm(AA);
     end
     mfprintf(fic, "%.17lf %.17lf %.17lf %.17lf %.17lf %d\n", err/iter, temps/iter, tempslu/iter, temps1b/iter, temps3b/iter, t);
 end

@@ -3,12 +3,7 @@
 /* Header for Numerical library developed to  */ 
 /* solve 1D Poisson problem (Heat equation)   */
 /**********************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <float.h>
-#include <limits.h>
-#include "blaslapack_headers.h"
+#include "tp_env.h"
 
 void set_GB_operator_rowMajor_poisson1D(double* AB, int* lab, int *la, int *kv);
 void set_GB_operator_colMajor_poisson1D(double* AB, int* lab, int *la, int *kv);
@@ -25,3 +20,7 @@ double eigmax_poisson1D(int *la);
 double eigmin_poisson1D(int *la);
 double richardson_alpha_opt(int *la);
 void richardson_alpha(double *AB, double *RHS, double *X, double *alpha_rich, int *lab, int *la,int *ku, int*kl, double *tol, int *maxit);
+void facto_lu(double *A, int la);
+void remontee(double *U, double *b, double* x, int la);
+void descente(double *L, double *b, double *x, int la);
+void GB_to_mat(double **R, double *A, int la);
