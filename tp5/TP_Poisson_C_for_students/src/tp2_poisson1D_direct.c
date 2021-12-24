@@ -65,7 +65,6 @@ int main(int argc,char *argv[])
 
   if (row == 1){ // LAPACK_ROW_MAJOR
     double *AB2 = malloc(sizeof(double)*lab*la);
-    set_GB_operator_rowMajor_poisson1D(AB2, &lab, &la, &kv);
 
     set_GB_operator_rowMajor_poisson1D(AB, &lab, &la, &kv);
 
@@ -84,9 +83,28 @@ int main(int argc,char *argv[])
 
     cblas_dgbmv(CblasRowMajor, CblasNoTrans, la, la, kl, ku, alpha, AB, lab, EX_SOL, incx, beta, y, incy);
 
+    set_GB_operator_rowMajor_poisson1D(AB2, &lab, &la, &kv);
+
+    double *L = malloc(sizeof(double)*lab*la);
+    double *U = malloc(sizeof(double)*lab*la);
+    double *R = malloc(sizeof(double)*lab*la);
+
+    facto_lu(AB2, la);
+
+    get_lu(AB2, U, L, la);
+
+    mul_matLU_GB(U, L, R, la);
+
+    set_GB_operator_rowMajor_poisson1D(AB2, &lab, &la, &kv);
+
+    sub_mat_GB(AB2, R, U, la);
+
     write_vec(y, &la, "Y_row.dat");
 
     free(AB2);
+    free(L);
+    free(U);
+    free(R);
   } 
 
   else { // LAPACK_COL_MAJOR

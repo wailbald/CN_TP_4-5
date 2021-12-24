@@ -21,7 +21,7 @@ void set_GB_operator_rowMajor_poisson1D(double* AB, int *lab, int *la, int *kv)
     AB[jj + 2 * (*la) + (*la)*(*kv)] = -1.0;
   }
   AB[(*la) * (*kv)] = 0.0;
-  AB[(*la) * (*lab)] = 0.0;
+  AB[(*la) * (*lab)-1] = 0.0;
   //TODO
 }
 void set_GB_operator_colMajor_poisson1D(double* AB, int *lab, int *la, int *kv){
@@ -202,7 +202,45 @@ void facto_lu(double *A, int la)
     A[ii + la] = A[ii + la] - A[kk+1] * A[kk + 2 * la];
     ii++;
   }
+}
 
+void get_lu(double *A, double *U, double *L, int la)
+{
+  for(size_t i = 0; i < la; i++)
+  {
+    L[i] = 0;
+    L[i+la] = 1;
+    L[i+2*la] = A[i+2*la];
+
+    U[i] = A[i];
+    U[i+la] = A[i+la];
+    U[i+2*la] = 0;
+  }
+}
+
+void mul_matLU_GB(double *U, double *L, double *R, int la)
+{
+  for(size_t i = 0; i < la; i++)
+  {
+      R[i] = U[i];
+
+      if(i != 0)
+        R[i+la] = U[i+la] * L[i+la] + U[i] * L[i-1+2*la];
+      else
+        R[i+la] = U[i+la] * L[i+la];
+
+      R[i+2*la] = U[i+la] * L[i+2*la];
+  }
+}
+
+void sub_mat_GB(double *A, double *B, double *R, int la)
+{
+  for(size_t i = 0; i < la; i++)
+  {
+    R[i] = A[i] - B[i];
+    R[i+la] = A[i+la] - B[i+la];
+    R[i+2*la] = A[i+2*la] - B[i+2*la];
+  }
 }
 
 void remontee(double *U, double *b, double* x, int la)
