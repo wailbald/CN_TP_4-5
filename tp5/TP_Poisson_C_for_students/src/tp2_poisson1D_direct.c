@@ -83,6 +83,8 @@ int main(int argc,char *argv[])
 
     cblas_dgbmv(CblasRowMajor, CblasNoTrans, la, la, kl, ku, alpha, AB, lab, EX_SOL, incx, beta, y, incy);
 
+    
+
     set_GB_operator_rowMajor_poisson1D(AB2, &lab, &la, &kv);
 
     double *L = malloc(sizeof(double)*lab*la);

@@ -24,17 +24,32 @@ endfunction
 A = init_matrix(100);
 b = init_vector(100,-5,5);
 
-disp(A);
-disp(b);
+[x,nbiter,vres] = myrichardson(A,b,1e-10,100000,1/2);
+[x,nbiter,vres2] = myrichardson(A,b,1e-10,100000,1/3);
+[x,nbiter,vres3] = myrichardson(A,b,1e-10,100000,1/4);
+[x,nbiter,vres4] = myrichardson(A,b,1e-10,100000,1/6);
 
-[x,nbiter,vres] = myrichardson(A,b,1e-10,100000);
-
-disp(norm(A\b -x)/norm(A));
-
-[fic, mod] = mopen("myrichardson.dat", "w");
+[fic1, mod] = mopen("myrichardson12.dat", "w");
+[fic2, mod] = mopen("myrichardson13.dat", "w");
+[fic3, mod] = mopen("myrichardson14.dat", "w");
+[fic4, mod] = mopen("myrichardson16.dat", "w");
 
 for i = 1 : length(vres)
-    mfprintf(fic,"%.17lf %d\n",vres(i),i);
+    mfprintf(fic1,"%.17lf %d\n",vres(i),i);
 end
+mclose(fic1);
 
-mclose(fic);
+for i = 1 : length(vres2)
+    mfprintf(fic2,"%.17lf %d\n",vres2(i),i);
+end
+mclose(fic2);
+
+for i = 1 : length(vres3)
+    mfprintf(fic3,"%.17lf %d\n",vres3(i),i);
+end
+mclose(fic3);
+
+for i = 1 : length(vres4)
+    mfprintf(fic4,"%.17lf %d\n",vres4(i),i);
+end
+mclose(fic4);

@@ -1,9 +1,9 @@
-function[x,nbiter,vres] = myrichardson(A,b,tol,itermax)
+function[x,nbiter,vres] = myrichardson(A,b,tol,itermax,alpha)
     n = size(A,1);  
     x = zeros(n,1);
     vres = list();
     
-    D = diag(diag(A));
+    D = alpha;
     nbiter = 0;
     
     res = norm(b-A*x);
@@ -11,7 +11,7 @@ function[x,nbiter,vres] = myrichardson(A,b,tol,itermax)
     
     while res > tol && nbiter < itermax
         
-        x = x + 1/2 * (b - A*x);
+        x = x + D * (b - A*x);
         res = norm(b-A*x);
         vres($+1) = res;
         nbiter = nbiter+1;

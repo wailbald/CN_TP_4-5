@@ -243,6 +243,7 @@ void sub_mat_GB(double *A, double *B, double *R, int la)
   }
 }
 
+/*
 void remontee(double *U, double *b, double* x, int la)
 {
   x[la-1] = b[la-1]/U[la-1 +la];
@@ -262,3 +263,4 @@ void descente(double *L, double *b, double *x, int la)
       x[ii] = b[ii] - L[ii-1 + 2*la] * x[ii-1];
   }
 }
+*/
