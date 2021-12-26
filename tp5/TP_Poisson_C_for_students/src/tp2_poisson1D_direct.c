@@ -83,7 +83,9 @@ int main(int argc,char *argv[])
 
     cblas_dgbmv(CblasRowMajor, CblasNoTrans, la, la, kl, ku, alpha, AB, lab, EX_SOL, incx, beta, y, incy);
 
-    
+    cblas_daxpy(la, -1.0, RHS2, 1, y, 1);
+    double result = cblas_ddot(la, y, 1, y,1);
+    printf("norme du résultat = %lf\n",result);
 
     set_GB_operator_rowMajor_poisson1D(AB2, &lab, &la, &kv);
 
@@ -101,7 +103,7 @@ int main(int argc,char *argv[])
 
     sub_mat_GB(AB2, R, U, la);
 
-    write_vec(y, &la, "Y_row.dat");
+    write_GB_operator_rowMajor_poisson1D(U, &lab, &la, "A-LU.dat");
 
     free(AB2);
     free(L);
@@ -127,6 +129,10 @@ int main(int argc,char *argv[])
     set_GB_operator_colMajor_poisson1D(AB, &lab, &la, &kv);
 
     cblas_dgbmv(CblasColMajor, CblasNoTrans, la, la, kl, ku, alpha, AB, lab, EX_SOL, incx, beta, y, incy);
+
+    cblas_daxpy(la, -1.0, RHS2, 1, y, 1);
+    double result = cblas_ddot(la, y, 1, y,1);
+    printf("norme du résultat = %lf\n",result);
 
     write_vec(y, &la, "Y_col.dat");
   }    

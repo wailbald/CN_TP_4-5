@@ -243,6 +243,11 @@ void sub_mat_GB(double *A, double *B, double *R, int la)
   }
 }
 
+void verif_mat(double *A, int la)
+{
+  
+}
+
 /*
 void remontee(double *U, double *b, double* x, int la)
 {
