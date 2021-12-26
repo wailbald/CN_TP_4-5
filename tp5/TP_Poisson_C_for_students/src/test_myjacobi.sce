@@ -24,9 +24,6 @@ endfunction
 A = init_matrix(100);
 b = init_vector(100,-5,5);
 
-disp(A);
-disp(b);
-
 [x,nbiter,vres] = myjacobi(A,b,1e-10,100000);
 
 disp(norm(A\b -x)/norm(A));

@@ -83,9 +83,13 @@ int main(int argc,char *argv[])
 
     cblas_dgbmv(CblasRowMajor, CblasNoTrans, la, la, kl, ku, alpha, AB, lab, EX_SOL, incx, beta, y, incy);
 
-    cblas_daxpy(la, -1.0, RHS2, 1, y, 1);
-    double result = cblas_ddot(la, y, 1, y,1);
-    printf("norme du résultat = %lf\n",result);
+    temp = cblas_ddot(la, y, 1, y,1);
+    temp = sqrt(temp);
+    cblas_daxpy(la, -1.0, y, 1, RHS2, 1);
+    relres = cblas_ddot(la, RHS2, 1, RHS2,1);
+    relres = sqrt(relres);
+    relres = relres / temp;
+    printf("\nThe relative residual error of dgbmv is relres = %e\n",relres);
 
     set_GB_operator_rowMajor_poisson1D(AB2, &lab, &la, &kv);
 
@@ -130,9 +134,13 @@ int main(int argc,char *argv[])
 
     cblas_dgbmv(CblasColMajor, CblasNoTrans, la, la, kl, ku, alpha, AB, lab, EX_SOL, incx, beta, y, incy);
 
-    cblas_daxpy(la, -1.0, RHS2, 1, y, 1);
-    double result = cblas_ddot(la, y, 1, y,1);
-    printf("norme du résultat = %lf\n",result);
+    temp = cblas_ddot(la, y, 1, y,1);
+    temp = sqrt(temp);
+    cblas_daxpy(la, -1.0, y, 1, RHS2, 1);
+    relres = cblas_ddot(la, RHS2, 1, RHS2,1);
+    relres = sqrt(relres);
+    relres = relres / temp;
+    printf("\nThe relative residual error of dgbmv is relres = %e\n",relres);
 
     write_vec(y, &la, "Y_col.dat");
   }    

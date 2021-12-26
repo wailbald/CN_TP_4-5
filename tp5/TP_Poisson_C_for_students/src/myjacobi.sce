@@ -7,12 +7,14 @@ function[x,nbiter,vres] = myjacobi(A,b,tol,itermax)
     nbiter = 0;
     
     res = norm(b-A*x);
+    res = res/norm(b);
     vres($+1) = res;
     
     while res > tol && nbiter < itermax
         
         x = x + inv(D) * (b - A*x);
         res = norm(b-A*x);
+        res = res/norm(b)
         vres($+1) = res;
         nbiter = nbiter+1;
         
